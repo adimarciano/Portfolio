@@ -38,18 +38,17 @@ const FEATURED = [
   {
     title: "Bingo Game",
     img: "./assets/Bingo.png",
-    url: "https://adimarciano.github.io/bingo/", // ← הוחלף USERNAME
+    url: "https://adimarciano.github.io/bingo/",
   },
   {
     title: "Vintage store",
     img: "./assets/vintage.png",
-    url: "https://vintage-story-2025.netlify.app/", // live demo ב-Netlify
+    url: "https://vintage-story-2025.netlify.app/",
   },
   {
     title: "Banner Editor",
-    // אם אין את הקובץ הבא ב-assets, החליפי לתמונה קיימת או הסירי את הכרטיס
-    img: "/assets/bannerist.jpeg",
-    url: "https://adimarciano.github.io/banner-editor/", // ← הוחלף USERNAME
+    img: "./assets/bannerist.jpeg",
+    url: "https://adimarciano.github.io/banner-editor/",
   },
 ];
 renderFeatured(FEATURED);
@@ -83,72 +82,70 @@ if (container) {
   if (!USER || USER === "YOUR_GITHUB_USERNAME") {
     container.innerHTML = `<div class="projects__loading">Set your GitHub username in <code>data-username</code> on the <b>#github-projects</b> element.</div>`;
   } else {
-    loadGitHub(USER); // <-- baseHeaders כבר מוגדר למעלה
+    loadGitHub(USER);
   }
+}
+
+/** שולף ריפוז לפי topics בבקשה אחת לכל topic (במקום /topics לכל ריפו) */
+async function searchReposByTopics(user) {
+  const combined = [];
+  for (const topic of TOPIC_KEYS) {
+    const url = `https://api.github.com/search/repositories?q=user:${encodeURIComponent(
+      user
+    )}+topic:${encodeURIComponent(topic)}&per_page=50&sort=updated`;
+    const r = await fetch(url, {
+      headers: { ...baseHeaders, Accept: "application/vnd.github+json" },
+    });
+    if (!r.ok) continue;
+    const { items = [] } = await r.json();
+    for (const repo of items) {
+      if (!repo.fork && !repo.private) combined.push(repo);
+    }
+  }
+  // הסרת כפילויות ושימור סדר עדיפויות (כוכבים ואז pushed_at)
+  const map = new Map();
+  combined
+    .sort(
+      (a, b) =>
+        (b.stargazers_count || 0) - (a.stargazers_count || 0) ||
+        +new Date(b.pushed_at) - +new Date(a.pushed_at)
+    )
+    .forEach((r) => map.set(r.id, r));
+  return Array.from(map.values());
 }
 
 async function loadGitHub(user) {
   try {
-    // רשימת ריפו
+    // 1) משיכת רשימת ריפוז בסיסית (ל־fallback ו/או allow-list)
     const res = await fetch(
       `https://api.github.com/users/${user}/repos?per_page=100&sort=updated`,
-      {
-        headers: { ...baseHeaders, Accept: "application/vnd.github+json" },
-      }
+      { headers: { ...baseHeaders, Accept: "application/vnd.github+json" } }
     );
     if (!res.ok) throw new Error(`GitHub API error: ${res.status}`);
-    const repos = await res.json();
+    const allRepos = (await res.json()).filter((r) => !r.fork && !r.private);
 
-    // בחירה: Allowlist > Topics > ברירת מחדל
-    let selection;
+    // 2) בחירה: Allowlist > Topics (Search API) > ברירת מחדל
+    let selection = [];
     if (GITHUB_ALLOWLIST.length) {
-      const set = new Set(GITHUB_ALLOWLIST.map((n) => n.toLowerCase()));
-      selection = repos.filter(
-        (r) => !r.fork && !r.private && set.has(r.name.toLowerCase())
-      );
+      const allow = new Set(GITHUB_ALLOWLIST.map((n) => n.toLowerCase()));
+      selection = allRepos.filter((r) => allow.has(r.name.toLowerCase()));
     } else if (USE_TOPICS) {
-      const picked = [];
-      for (const r of repos) {
-        if (r.fork || r.private) continue;
-        try {
-          const tRes = await fetch(
-            `https://api.github.com/repos/${user}/${r.name}/topics`,
-            {
-              headers: {
-                ...baseHeaders,
-                Accept: "application/vnd.github+json",
-              },
-            }
-          );
-          if (tRes.ok) {
-            const { names = [] } = await tRes.json();
-            if (names.some((n) => TOPIC_KEYS.includes(String(n).toLowerCase())))
-              picked.push(r);
-          }
-        } catch (_) {}
-      }
-      selection = picked.length
-        ? picked
-        : repos
-            .filter((r) => !r.fork && !r.private)
-            .sort(
-              (a, b) =>
-                b.stargazers_count - a.stargazers_count ||
-                +new Date(b.pushed_at) - +new Date(a.pushed_at)
-            )
-            .slice(0, 6);
+      selection = await searchReposByTopics(user);
+      if (!selection.length) selection = allRepos; // נפילה חזרה אם אין topicים
     } else {
-      selection = repos
-        .filter((r) => !r.fork && !r.private)
-        .sort(
-          (a, b) =>
-            b.stargazers_count - a.stargazers_count ||
-            +new Date(b.pushed_at) - +new Date(a.pushed_at)
-        )
-        .slice(0, 6);
+      selection = allRepos;
     }
 
-    // שפות + רינדור
+    // 3) דירוג וסינון למקסימום 6 כרטיסים
+    selection = selection
+      .sort(
+        (a, b) =>
+          (b.stargazers_count || 0) - (a.stargazers_count || 0) ||
+          +new Date(b.pushed_at) - +new Date(a.pushed_at)
+      )
+      .slice(0, 6);
+
+    // 4) איסוף שפות (עד 6 קריאות — סביר בלי טוקן)
     const cards = await Promise.all(
       selection.map(async (repo) => {
         let langs = [];
