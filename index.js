@@ -38,7 +38,7 @@ const FEATURED = [
   {
     title: "Bingo Game",
     img: "./assets/Bingo.png",
-    url: "https://adimarciano.github.io/bingo/",
+    url: "https://storied-fenglisu-643bb1.netlify.app/",
   },
   {
     title: "Vintage store",
