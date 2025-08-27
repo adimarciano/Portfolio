@@ -48,7 +48,7 @@ const FEATURED = [
   {
     title: "Banner Editor",
     // אם אין את הקובץ הבא ב-assets, החליפי לתמונה קיימת או הסירי את הכרטיס
-    img: "./assets/bannerist-thumb.jpg",
+    img: "/assets/bannerist.jpeg",
     url: "https://adimarciano.github.io/banner-editor/", // ← הוחלף USERNAME
   },
 ];
