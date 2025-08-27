@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Adi Marciano — Portfolio</title>
+
+    <!-- Font -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="./style.css?v=3" />
+  </head>
+  <body>
+    <!-- Top Nav -->
+    <header class="site-header">
+      <nav class="nav">
+        <a class="nav-link" href="#about">About</a>
+        <a class="nav-link" href="#projects">Projects</a>
+        <a class="nav-link" href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Hero -->
+      <section class="hero" aria-label="Intro">
+        <h1 class="hero__title">Adi Marciano</h1>
+        <p class="hero__subtitle">FullStack Developer</p>
+      </section>
+
+      <!-- About -->
+      <section id="about" class="card about" aria-label="About me">
+        <div class="about__media">
+          <!-- החליפי לתמונה שלך -->
+          <img
+            src="./assets/db51fece-a185-452a-8141-1760013ca92d.JPG"
+            alt="Portrait of Adi Marciano"
+          />
+        </div>
+        <div class="about__text">
+          <p>
+            I'm a first-year Practical Software Engineering student at Shenkar
+            and an emerging full-stack developer. I build end-to-end projects
+            with HTML, CSS, and JavaScript on the front end and C# (and Python
+            when needed) on the back end. Through my studies and the She Codes
+            Fullstack program (2023), I've practiced object-oriented
+            programming, databases, and application development while focusing
+            on clean, accessible UX. My IT Support experience at Shenkar
+            strengthened my troubleshooting skills and attention to detail, and
+            earlier roles in retail and as a kitchen manager sharpened my
+            communication, leadership, and teamwork. I'm highly motivated,
+            self-directed, and excited to turn real-world requirements into
+            reliable, user-friendly products.
+          </p>
+        </div>
+      </section>
+
+      <!-- Featured projects – images + caption link -->
+      <section class="featured" aria-label="Featured projects (visual)">
+        <div class="featured__grid" id="featured-grid"></div>
+      </section>
+
+      <!-- GitHub Projects (dynamic) -->
+      <section id="projects" class="projects" aria-label="Projects from GitHub">
+        <h2 class="section-title">Projects</h2>
+
+        <div
+          id="github-projects"
+          class="projects__grid"
+          data-username="adimarciano"
+        >
+          <div class="projects__loading" role="status" aria-live="polite">
+            Loading projects…
+          </div>
+        </div>
+
+        <p class="projects__hint">
+          Tip: only public repositories are shown. To feature specific repos,
+          use the allow-list in <code>index.js</code>.
+        </p>
+      </section>
+
+      <!-- Contact -->
+      <section id="contact" class="contact" aria-label="Contact">
+        <h2 class="contact__title">contact me at</h2>
+        <a class="contact__email" href="mailto:marciano.adi@gmail.com"
+          >marciano.adi@gmail.com</a
+        >
+
+        <div class="contact__links">
+          <a
+            href="https://github.com/adimarciano"
+            target="_blank"
+            rel="noreferrer"
+            >GitHub</a
+          >
+          <span>·</span>
+          <a
+            href="https://www.linkedin.com/in/YOUR_LINKEDIN_SLUG"
+            target="_blank"
+            rel="noreferrer"
+            >LinkedIn</a
+          >
+          <!-- TODO: החליפי YOUR_LINKEDIN_SLUG ל-slug האמיתי של הפרופיל שלך בלינקדאין -->
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" aria-label="Footer">
+      <p>© <span id="year"></span> Adi Marciano</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="./index.js" defer></script>
+  </body>
+</html>
